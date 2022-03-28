@@ -39,7 +39,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: alldebrid-get.js
-          path: ./bin/alldebrid-get.js
+          path: ./bin/alldebrid-get.mjs
 
   release:
     if: github.event.inputs.version
@@ -53,4 +53,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.event.inputs.version }}
-          files: "**/alldebrid-get.js"
+          files: "**/alldebrid-get.mjs"

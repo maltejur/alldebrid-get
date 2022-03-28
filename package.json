@@ -1,10 +1,10 @@
 {
   "name": "alldebrid-get",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "type": "module",
   "scripts": {
-    "dev": "pnpm build && node bin/alldebrid-get.js",
-    "build": "ncc build src/index.ts -m -o dist && cp -v dist/index.js bin/alldebrid-get.js"
+    "dev": "pnpm build && node bin/alldebrid-get.mjs",
+    "build": "ncc build src/index.ts -m -o dist && cp -v dist/index.js bin/alldebrid-get.mjs"
   },
   "dependencies": {
     "@colors/colors": "^1.5.0",
