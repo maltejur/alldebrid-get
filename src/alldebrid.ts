@@ -1,24 +1,33 @@
 import axios from "axios";
 import fs from "fs";
+import path from "path";
 
 let apikey: string | undefined;
 
 const agent = "alldebrid-get";
+const appdataFolder = path.join(
+  process.env.APPDATA ||
+    (process.platform == "darwin"
+      ? process.env.HOME + "/Library/Preferences"
+      : process.env.HOME + "/.local/share"),
+  "alldebrid-get"
+);
+if (!fs.existsSync(appdataFolder))
+  fs.mkdirSync(appdataFolder, { recursive: true });
+const configFile = path.join(appdataFolder, "config.json");
 axios.defaults.baseURL = "https://api.alldebrid.com/v4";
 
 export function loadConfig() {
-  if (!fs.existsSync("./config.json")) fs.writeFileSync("./config.json", "{}");
-  const config = JSON.parse(fs.readFileSync("./config.json").toString());
+  if (!fs.existsSync(configFile)) fs.writeFileSync(configFile, "{}");
+  const config = JSON.parse(fs.readFileSync(configFile).toString());
   apikey = config.apikey;
 }
 
 export async function updateConfig(changes: Object) {
-  let config = JSON.parse(
-    (await fs.promises.readFile("./config.json")).toString()
-  );
+  let config = JSON.parse((await fs.promises.readFile(configFile)).toString());
   config = { ...config, ...changes };
   apikey = config.apikey;
-  await fs.promises.writeFile("./config.json", JSON.stringify(config));
+  await fs.promises.writeFile(configFile, JSON.stringify(config));
 }
 
 export interface GetPinResponse {
