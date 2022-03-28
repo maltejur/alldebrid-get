@@ -1,0 +1,24 @@
+{
+  "name": "alldebrid-get",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm build && node bin/alldebrid-get.js",
+    "build": "ncc build src/index.ts -m -o dist && cp -v dist/index.js bin/alldebrid-get.js"
+  },
+  "dependencies": {
+    "@colors/colors": "^1.5.0",
+    "axios": "^0.26.1",
+    "commander": "^9.1.0",
+    "node-downloader-helper": "^2.1.0",
+    "ora": "^6.1.0",
+    "prompts": "^2.4.2",
+    "typescript": "^4.6.3"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.23",
+    "@types/prompts": "^2.0.14",
+    "@vercel/ncc": "^0.33.3",
+    "ts-node": "^10.7.0"
+  }
+}
