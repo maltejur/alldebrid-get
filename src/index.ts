@@ -106,13 +106,30 @@ program
         } else if (magnet.statusCode === 4) {
           clearInterval(interval);
           spinner.stop();
+          let files: string[];
+          if (magnet.links.length > 1 && process.stdout.isTTY) {
+            const response = await prompts({
+              type: "multiselect",
+              name: "files",
+              message: "Which files do you want to download?",
+              choices: magnet.links.map((link) => ({
+                title: link.filename,
+                value: link.link,
+                selected: true,
+              })),
+            });
+            if (response.files) files = response.files;
+            else {
+              exit(1);
+            }
+          } else files = magnet.links.map((link) => link.link);
           spinner = ora(
             `${magnet.filename.dim}: Creating download link${
               magnet.links.length > 1 ? "s" : ""
             }`
           ).start();
           const links = await Promise.all(
-            magnet.links.map((link) => alldebrid.unlockLink(link.link))
+            files.map((file: string) => alldebrid.unlockLink(file))
           );
           spinner.stop();
           spinner = ora(`${magnet.filename.dim}: Downloading to PC`).start();
@@ -158,9 +175,8 @@ program
           spinner.succeed(
             `Downloaded ${colors.bold(magnet.filename)} successfully (${
               links.length
-            } files)`
+            } file${links.length > 1 ? "s" : ""})`
           );
-          console.log();
         }
       });
     }, 1000);
