@@ -120,7 +120,10 @@ program
           for (const link of links) {
             await new Promise<void>(async (resolve) => {
               const downloadFolder =
-                options.o || options.O || options.output || ".";
+                options.o ||
+                options.O ||
+                options.output ||
+                (links.length > 1 ? magnet.filename : ".");
 
               if (!existsSync(downloadFolder))
                 await fs.promises.mkdir(downloadFolder, { recursive: true });
