@@ -1,6 +1,7 @@
 import axios from "axios";
 import fs from "fs";
 import path from "path";
+import { exit } from "process";
 
 let apikey: string | undefined;
 
@@ -30,6 +31,21 @@ export async function updateConfig(changes: Object) {
   await fs.promises.writeFile(configFile, JSON.stringify(config));
 }
 
+async function get(
+  path: string,
+  { params }: { params?: Record<string, any> } = {}
+) {
+  const response = await axios.get(path, {
+    params: { agent, ...(apikey ? { apikey } : {}), ...params },
+  });
+  const { status, data, error } = response.data;
+  if (status === "success") return data;
+  else if (status === "error" && error) {
+    console.error(`${"\ralldebrid error:".gray} ${error.message}`);
+    exit(1);
+  } else throw Error(JSON.stringify(error || response.data));
+}
+
 export interface GetPinResponse {
   pin: string;
   check: string;
@@ -39,12 +55,7 @@ export interface GetPinResponse {
   check_url: string;
 }
 export async function getPin(): Promise<GetPinResponse> {
-  const response = await axios.get("/pin/get", {
-    params: { agent },
-  });
-  const { status, data } = response.data;
-  if (status === "success") return data;
-  else throw Error(JSON.stringify(data?.error || response.data));
+  return get("/pin/get");
 }
 
 export interface CheckPinResponse {
@@ -56,16 +67,13 @@ export async function checkPin(
   check: string,
   pin: string
 ): Promise<CheckPinResponse> {
-  const response = await axios.get("/pin/check", {
-    params: { agent, check, pin },
+  const response: CheckPinResponse = await get("/pin/check", {
+    params: { check, pin },
   });
-  const { status, data } = response.data;
-  if (status === "success") {
-    if (data.apikey) {
-      await updateConfig({ apikey: data.apikey });
-    }
-    return data;
-  } else throw Error(JSON.stringify(data?.error || response.data));
+  if (response.apikey) {
+    await updateConfig({ apikey: response.apikey });
+  }
+  return response;
 }
 
 export async function isLoggedIn() {
@@ -89,12 +97,7 @@ export interface UploadMagentResponse {
 export async function uploadMagnet(
   magnet: string
 ): Promise<UploadMagentResponse> {
-  const response = await axios.get("/magnet/upload", {
-    params: { agent, apikey, "magnets[]": magnet },
-  });
-  const { status, data } = response.data;
-  if (status === "success") return data;
-  else throw Error(JSON.stringify(data?.error || response.data));
+  return get("/magnet/upload", { params: { "magnets[]": magnet } });
 }
 
 export interface Magnet {
@@ -121,12 +124,7 @@ export interface MagnetStatusResponse {
   magnets: Magnet;
 }
 export async function magnetStatus(id?: number): Promise<MagnetStatusResponse> {
-  const response = await axios.get("/magnet/status", {
-    params: { agent, apikey, ...(id ? { id } : {}) },
-  });
-  const { status, data } = response.data;
-  if (status === "success") return data;
-  else throw Error(JSON.stringify(data?.error || response.data));
+  return get("/magnet/status", { params: { ...(id ? { id } : {}) } });
 }
 
 export interface UnlockLinkResponse {
@@ -149,12 +147,7 @@ export interface UnlockLinkResponse {
   hostDomain: string;
 }
 export async function unlockLink(link: string): Promise<UnlockLinkResponse> {
-  const response = await axios.get("/link/unlock", {
-    params: { agent, apikey, link },
-  });
-  const { status, data } = response.data;
-  if (status === "success") return data;
-  else throw Error(JSON.stringify(data?.error || response.data));
+  return get("/link/unlock", { params: { link } });
 }
 
 loadConfig();
