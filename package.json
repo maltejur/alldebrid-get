@@ -1,6 +1,6 @@
 {
   "name": "alldebrid-get",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "type": "module",
   "scripts": {
     "dev": "pnpm build && node bin/alldebrid-get.mjs",

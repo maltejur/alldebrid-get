@@ -2,6 +2,7 @@ import axios from "axios";
 import fs from "fs";
 import path from "path";
 import { exit } from "process";
+import colors from "@colors/colors";
 
 let apikey: string | undefined;
 
@@ -41,7 +42,7 @@ async function get(
   const { status, data, error } = response.data;
   if (status === "success") return data;
   else if (status === "error" && error) {
-    console.error(`${"\ralldebrid error:".gray} ${error.message}`);
+    console.error(`\r${"✖ ".red}${"\ralldebrid error:".gray} ${error.message}`);
     exit(1);
   } else throw Error(JSON.stringify(error || response.data));
 }
